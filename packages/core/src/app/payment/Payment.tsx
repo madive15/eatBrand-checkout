@@ -193,7 +193,7 @@ class Payment extends Component<
 
         console.log(this.props);
 
-        // CJ payment window popup open
+        // CJ payment window popup open center
         const krPaymentMethods = (payName: string) => {
             const PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
             let width = 600;
@@ -206,6 +206,8 @@ class Payment extends Component<
 
             window.open(PAY_URL, 'popup', spec);
         }
+
+        // CJ payment mapping(parameter , imgsrcName)
         const krPaymentMethodsString: KoreaPaymentMethodsProps[] = [
             {
                 params: "Creditcard",
