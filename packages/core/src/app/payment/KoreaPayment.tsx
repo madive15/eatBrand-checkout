@@ -3,7 +3,6 @@ import { TranslatedString } from '../locale';
 import { Button, ButtonSize, ButtonVariant } from '../ui/button';
 
 
-// types
 interface KoreaPaymentProps {
   params: string,
   imgName:string,
