@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "appVersion": "1.260.1",
+  "appVersion": "1.260.2",
   "dynamicChunks": {
     "js": [
       "361-26c62f80.js",
@@ -11,34 +11,41 @@
       "billing-fc178607.js",
       "cart-summary-drawer-3d736a03.js",
       "cart-summary-3fd809e8.js",
-      "customer-7b3ec3e7.js",
+      "customer-40f193e2.js",
       "order-summary-drawer-8e276b15.js",
       "order-summary-33379232.js",
-      "payment-16cc3990.js",
-      "shipping-280b8d5e.js"
+      "payment-1e29834d.js",
+      "shipping-4ed98e3d.js"
     ],
     "css": [
       "billing-8df3ad3b.css",
       "cart-summary-drawer-6e3e5baa.css",
       "cart-summary-6e3e5baa.css",
       "customer-99380b19.css",
-      "payment-ef4c2c40.css",
+      "payment-3a17e6aa.css",
       "shipping-cbd9d440.css"
     ],
     "svg": [
       "static/card-abef8595.svg"
     ],
     "png": [
+      "static/icon_Card-bab04603.png",
+      "static/icon_account-76f7f6e5.png",
+      "static/icon_cellularPay-210e0a40.png",
+      "static/icon_kakaopay-2d21eec0.png",
+      "static/icon_naverpay-d11156af.png",
+      "static/icon_payco-1753f2e7.png",
+      "static/icon_virtual-4ee1a1fe.png",
       "static/powered_by_google_on_white-f127e368.png"
     ]
   },
   "js": [
-    "runtime-db96b40d.js",
+    "runtime-7b42c952.js",
     "773-c53e8f61.js",
     "375-43cb7da1.js",
     "608-4026a4c6.js",
     "957-11c6ab74.js",
-    "checkout-34dfc056.js"
+    "checkout-c86151be.js"
   ],
   "css": [
     "checkout-a74f84b5.css"

@@ -34,6 +34,10 @@ import {
     PaymentMethodId,
     PaymentMethodProviderType,
 } from './paymentMethod';
+// import { Button, ButtonSize, ButtonVariant } from '../ui/button';
+import KoreaPayment from './KoreaPayment';
+import './cj-payment.scss';
+
 
 export interface PaymentProps {
     errorLogger: ErrorLogger;
@@ -47,6 +51,8 @@ export interface PaymentProps {
     onSubmit?(): void;
     onSubmitError?(error: Error): void;
     onUnhandledError?(error: Error): void;
+    customizeCheckout: string;
+    customzieCart: any;
 }
 
 interface WithCheckoutPaymentProps {
@@ -82,6 +88,11 @@ interface PaymentState {
     shouldHidePaymentSubmitButton: { [key: string]: boolean };
     submitFunctions: { [key: string]: ((values: PaymentFormValues) => void) | null };
     validationSchemas: { [key: string]: ObjectSchema<Partial<PaymentFormValues>> | null };
+}
+
+interface KoreaPaymentMethodsProps {
+    params: string;
+    imgName: string
 }
 
 class Payment extends Component<
@@ -161,6 +172,8 @@ class Payment extends Component<
             isUsingMultiShipping,
             methods,
             applyStoreCredit,
+            customizeCheckout,
+            customzieCart,
             ...rest
         } = this.props;
 
@@ -173,8 +186,56 @@ class Payment extends Component<
             shouldHidePaymentSubmitButton,
         } = this.state;
 
+
         const uniqueSelectedMethodId =
             selectedMethod && getUniquePaymentMethodId(selectedMethod.id, selectedMethod.gateway);
+        
+
+        console.log(this.props);
+
+        // CJ payment window popup open
+        const krPaymentMethods = (payName: string) => {
+            const PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
+            let width = 600;
+            let height = 700;
+            let top = (window.innerHeight - height) / 2 + screenY;
+            let left = (window.innerWidth - width) / 2 + screenX;
+            let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
+            spec += ', width=' + width + ', height=' + height;
+            spec += ', top=' + top + ', left=' + left;
+
+            window.open(PAY_URL, 'popup', spec);
+        }
+        const krPaymentMethodsString: KoreaPaymentMethodsProps[] = [
+            {
+                params: "Creditcard",
+                imgName:"credit"
+            },
+            {
+                params: "PCO",
+                imgName:"pco"
+            },
+            {
+                params: "Account",
+                imgName:"account"
+            },
+            {
+                params: "VirtualAccount",
+                imgName:"virtualAccount"
+            },
+            {
+                params: "NVP",
+                imgName:"nvp"
+            },
+            {
+                params: "KKO",
+                imgName:"kakao"
+            },
+            {
+                params: "HPP",
+                imgName:"hpp"
+            }
+        ]
 
         return (
             <PaymentContext.Provider value={this.getContextValue()}>
@@ -210,6 +271,19 @@ class Payment extends Component<
                             }
                         />
                     )}
+                    {/* KoreaCJ Payment Mapping */}
+                    <div className="payment-wrap checkout-form">
+                        {krPaymentMethodsString.map((item: KoreaPaymentMethodsProps, idx) => {
+                            return (
+                                <KoreaPayment
+                                    krPaymentMethods={krPaymentMethods}
+                                    params={item.params}
+                                    imgName={item.imgName}
+                                    key={idx}
+                                />
+                            )
+                        })}
+                    </div>
                 </LoadingOverlay>
 
                 {this.renderOrderErrorModal()}
@@ -293,6 +367,8 @@ class Payment extends Component<
         if (shouldHidePaymentSubmitButton[uniqueId] === disabled) {
             return;
         }
+
+        console.log(this.state);
 
         this.setState({
             shouldHidePaymentSubmitButton: {
@@ -430,7 +506,7 @@ class Payment extends Component<
             onSubmitError = noop,
             submitOrder,
         } = this.props;
-
+        console.log(this.props);
         const { selectedMethod = defaultMethod, submitFunctions } = this.state;
 
         const customSubmit =
@@ -509,8 +585,8 @@ class Payment extends Component<
 }
 
 export function mapToPaymentProps({
-        checkoutService,
-        checkoutState,
+    checkoutService,
+    checkoutState,
 }: CheckoutContextProps): WithCheckoutPaymentProps | null {
     const {
         data: {
@@ -636,3 +712,5 @@ export function mapToPaymentProps({
 }
 
 export default withLanguage(withCheckout(mapToPaymentProps)(Payment));
+
+

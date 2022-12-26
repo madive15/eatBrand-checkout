@@ -482,6 +482,8 @@ class Checkout extends Component<
                         onSubmit={this.navigateToOrderConfirmation}
                         onSubmitError={this.handleError}
                         onUnhandledError={this.handleUnhandledError}
+                        customizeCheckout={this.props.checkoutId}
+                        customzieCart={cart}
                     />
                 </LazyContainer>
             </CheckoutStep>

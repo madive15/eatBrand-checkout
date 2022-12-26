@@ -44,7 +44,7 @@
         },
         "billing": {
             "billing_address_heading": "Billing Address",
-            "billing_heading": "Billing",
+            "billing_heading": "빌링",
             "save_billing_address_error": "An error occurred while saving the billing address to your price quote. Please try again.",
             "billing_address_amazon": "Same as the Billing address set by you in your Amazon account.",
             "billing_address_amazonpay": "Managed by Amazon Pay",
@@ -53,7 +53,8 @@
         "cart": {
             "billed_amount_text": "*You will be charged and invoiced {total} ({code}) for this order.",
             "based_on_currency_text": "Based on {total} {code}",
-            "cart_heading": "Order Summary",
+            "cart_heading": "주문 현황",
+            "cash_on_delivery":"Cash on Delivery",
             "digital_item_text": "Digital Item",
             "discount_text": "Discount",
             "downloads_action": "Go to Downloads",
@@ -121,7 +122,7 @@
             "guest_could_login": "Looks like you have an account. Sign in with {email} for a faster checkout.",
             "guest_must_login": "Looks like you have an account. Please sign in to proceed with {email}, or use another email.",
             "guest_temporary_disabled": "Guest checkout is temporarily disabled. Please sign in or <a href=\"{url}\" target=\"_blank\">create an account</a> to continue.",
-            "customer_heading": "Customer",
+            "customer_heading": "한국고객....",
             "email_invalid_error": "Email address must be valid",
             "email_label": "Email",
             "email_required_error": "Email address is required",
@@ -252,7 +253,7 @@
             "payment_cancelled": "Payment was cancelled",
             "payment_error": "An error occurred while processing your payment. Please try again.",
             "payment_error_heading": "Payment Failed",
-            "payment_heading": "Payment",
+            "payment_heading": "결제",
             "payment_invalid_error_heading": "Payment Unavailable",
             "payment_method_disabled_error": "The selected payment method is no longer valid. Click OK to see the most up-to-date payment methods.",
             "payment_method_error": "Response from payment provider: {message}",
@@ -385,7 +386,14 @@
                 "user_authorization_error": "There was an error while processing your payment. Please contact us.",
                 "vaulting_service_unavailable": "Vaulting service is currently not available.",
                 "voided_transaction": "Unable to process your payment because the transaction has already been voided. Please try again or contact us."
-            }
+            },
+            "korea_payment_Creditcard":"신용카드",
+            "korea_payment_PCO":"페이코",
+            "korea_payment_Account":"계좌이체",
+            "korea_payment_VirtualAccount":"가상계좌",
+            "korea_payment_NVP":"네이버페이",
+            "korea_payment_KKO":"카카오페이",
+            "korea_payment_HPP":"휴대폰결제"
         },
         "redeemable": {
             "applied_text": "Applied",
@@ -437,7 +445,7 @@
             "multishipping_guest_create": "or <a href=\"{url}\" target=\"_blank\">create an account</a> prior to proceeding.",
             "ship_to_multi": "Ship to multiple addresses",
             "ship_to_single": "Ship to a single address",
-            "shipping_heading": "Shipping",
+            "shipping_heading": "배송",
             "shipping_method_label": "Shipping Method",
             "shipping_option_expired_error": "The shipping price you were quoted is no longer valid. Click OK to see the most up-to-date shipping prices.",
             "shipping_option_expired_heading": "Your shipping price has been updated",
@@ -496,4 +504,5 @@
             "order_status_update_facebook_messenger_heading": "Get instant updates of your order to Messenger"
         }
     }
-}
+  }
+  
