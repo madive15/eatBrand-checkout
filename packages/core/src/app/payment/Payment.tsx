@@ -189,20 +189,28 @@ class Payment extends Component<
 
         const uniqueSelectedMethodId =
             selectedMethod && getUniquePaymentMethodId(selectedMethod.id, selectedMethod.gateway);
-        
+
 
         console.log(this.props);
 
         // CJ payment window popup open center
         const krPaymentMethods = (payName: string) => {
-            const PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
-            let width = 600;
-            let height = 700;
-            let top = (window.innerHeight - height) / 2 + screenY;
-            let left = (window.innerWidth - width) / 2 + screenX;
-            let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
+            let PAY_URL;
+            let width = 600,
+                height = 700,
+                top = (window.innerHeight - height) / 2 + screenY,
+                left = (window.innerWidth - width) / 2 + screenX,
+                spec = 'status=no, menubar=no, toolbar=no, resizable=no';
             spec += ', width=' + width + ', height=' + height;
             spec += ', top=' + top + ', left=' + left;
+
+            const checkUrl = window.confirm('localhost:3000 번으로 하시겠습니까?');
+
+            if (checkUrl) {
+                PAY_URL = `https://localhost:3000/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
+            } else {
+                PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
+            }
 
             window.open(PAY_URL, 'popup', spec);
         }
@@ -211,31 +219,31 @@ class Payment extends Component<
         const krPaymentMethodsString: KoreaPaymentMethodsProps[] = [
             {
                 params: "Creditcard",
-                imgName:"credit"
+                imgName: "credit"
             },
             {
                 params: "PCO",
-                imgName:"pco"
+                imgName: "pco"
             },
             {
                 params: "Account",
-                imgName:"account"
+                imgName: "account"
             },
             {
                 params: "VirtualAccount",
-                imgName:"virtualAccount"
+                imgName: "virtualAccount"
             },
             {
                 params: "NVP",
-                imgName:"nvp"
+                imgName: "nvp"
             },
             {
                 params: "KKO",
-                imgName:"kakao"
+                imgName: "kakao"
             },
             {
                 params: "HPP",
-                imgName:"hpp"
+                imgName: "hpp"
             }
         ]
 
