@@ -92,7 +92,8 @@ interface PaymentState {
 
 interface KoreaPaymentMethodsProps {
     params: string;
-    imgName: string
+    imgName: string;
+    id: number;
 }
 
 class Payment extends Component<
@@ -191,7 +192,45 @@ class Payment extends Component<
             selectedMethod && getUniquePaymentMethodId(selectedMethod.id, selectedMethod.gateway);
 
 
-        console.log(this.props);
+
+        // CJ payment mapping(ID, parameter, imgsrcName)
+        const krPaymentMethodsString: KoreaPaymentMethodsProps[] = [
+            {
+                id: 0,
+                params: "Creditcard",
+                imgName: "credit"
+            },
+            {
+                id: 1,
+                params: "PCO",
+                imgName: "pco"
+            },
+            {
+                id: 2,
+                params: "Account",
+                imgName: "account"
+            },
+            {
+                id: 3,
+                params: "VirtualAccount",
+                imgName: "virtualAccount"
+            },
+            {
+                id: 4,
+                params: "NVP",
+                imgName: "nvp"
+            },
+            {
+                id: 5,
+                params: "KKO",
+                imgName: "kakao"
+            },
+            {
+                id: 6,
+                params: "HPP",
+                imgName: "hpp"
+            }
+        ]
 
         // CJ payment window popup open center
         const krPaymentMethods = (payName: string) => {
@@ -204,10 +243,10 @@ class Payment extends Component<
             spec += ', width=' + width + ', height=' + height;
             spec += ', top=' + top + ', left=' + left;
 
-            const checkUrl = window.confirm('localhost:3000 번으로 하시겠습니까?');
+            const checkUrl = window.confirm('확인 -> localhost\n취소 -> payment.madive.co.kr');
 
             if (checkUrl) {
-                PAY_URL = `https://localhost:3000/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
+                PAY_URL = `http://localhost/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
             } else {
                 PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
             }
@@ -215,37 +254,6 @@ class Payment extends Component<
             window.open(PAY_URL, 'popup', spec);
         }
 
-        // CJ payment mapping(parameter , imgsrcName)
-        const krPaymentMethodsString: KoreaPaymentMethodsProps[] = [
-            {
-                params: "Creditcard",
-                imgName: "credit"
-            },
-            {
-                params: "PCO",
-                imgName: "pco"
-            },
-            {
-                params: "Account",
-                imgName: "account"
-            },
-            {
-                params: "VirtualAccount",
-                imgName: "virtualAccount"
-            },
-            {
-                params: "NVP",
-                imgName: "nvp"
-            },
-            {
-                params: "KKO",
-                imgName: "kakao"
-            },
-            {
-                params: "HPP",
-                imgName: "hpp"
-            }
-        ]
 
         return (
             <PaymentContext.Provider value={this.getContextValue()}>
@@ -283,13 +291,13 @@ class Payment extends Component<
                     )}
                     {/* KoreaCJ Payment Mapping */}
                     <div className="payment-wrap checkout-form">
-                        {krPaymentMethodsString.map((item: KoreaPaymentMethodsProps, idx) => {
+                        {krPaymentMethodsString.map((item: KoreaPaymentMethodsProps) => {
                             return (
                                 <KoreaPayment
                                     krPaymentMethods={krPaymentMethods}
                                     params={item.params}
                                     imgName={item.imgName}
-                                    key={idx}
+                                    key={item.id}
                                 />
                             )
                         })}
