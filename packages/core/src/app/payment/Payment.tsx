@@ -78,6 +78,7 @@ interface WithCheckoutPaymentProps {
     loadCheckout(): Promise<CheckoutSelectors>;
     loadPaymentMethods(): Promise<CheckoutSelectors>;
     submitOrder(values: OrderRequestBody): Promise<CheckoutSelectors>;
+    storeHash:string;
 }
 
 interface PaymentState {
@@ -175,6 +176,7 @@ class Payment extends Component<
             applyStoreCredit,
             customizeCheckout,
             customzieCart,
+            storeHash,
             ...rest
         } = this.props;
 
@@ -246,9 +248,9 @@ class Payment extends Component<
             const checkUrl = window.confirm('확인 -> localhost\n취소 -> payment.madive.co.kr');
 
             if (checkUrl) {
-                PAY_URL = `http://localhost/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
+                PAY_URL = `http://localhost/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
             } else {
-                PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}`;
+                PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
             }
 
             window.open(PAY_URL, 'popup', spec);
@@ -697,6 +699,7 @@ export function mapToPaymentProps({
 
     return {
         applyStoreCredit: checkoutService.applyStoreCredit,
+        storeHash:config.storeProfile.storeHash,
         availableStoreCredit: customer.storeCredit,
         cartUrl: config.links.cartLink,
         clearError: checkoutService.clearError,
