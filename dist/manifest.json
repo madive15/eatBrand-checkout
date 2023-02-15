@@ -14,7 +14,7 @@
       "customer-40f193e2.js",
       "order-summary-drawer-8e276b15.js",
       "order-summary-33379232.js",
-      "payment-1531dcd2.js",
+      "payment-5d71c324.js",
       "shipping-4ed98e3d.js"
     ],
     "css": [
@@ -40,7 +40,7 @@
     ]
   },
   "js": [
-    "runtime-8dddc743.js",
+    "runtime-04e7bb54.js",
     "773-c53e8f61.js",
     "375-43cb7da1.js",
     "608-4026a4c6.js",
