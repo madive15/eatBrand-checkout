@@ -12,6 +12,14 @@ interface VirtualProps {
   krPaymentMethods(payName: string, ...rest: string[]): void;
 }
 
+interface VirtualOpenParamsProps {
+  payName: string,
+  bankCd: string,
+  accountOwner: string,
+  cashReceiptUse: string,
+  cashReceiptInfo: string,
+}
+
 const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerId, storeHash }: VirtualProps) => {
 
   // This variables are for prevent to confuse with function(virtualOpenLink) parameter.
@@ -49,9 +57,17 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
   const [textInput, setTextInput] = useState({
     CashReceiptInfo: '',
     AccountOwner: ''
-  })
+  });
 
   const { CashReceiptInfo, AccountOwner } = textInput;
+
+  // Radio display state
+  const [radioValue, setRadioValue] = useState('00');
+
+  const [validation, setValidation] = useState({
+    AccountOwner:false,
+    CashReceiptInfo:false,
+  });
 
   const onChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { target: { name, value } } = e;
@@ -60,25 +76,17 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
       [name]: value
     });
     const nameRegex = /^[가-힣]{2,4}$/;
-    if (!nameRegex.test(e.target.value) && name === 'AccountOwner') {
-      setValidation(true);
-    } else {
-      setValidation(false);
-    }
-
     const numberRegex = /^[0-9]{2,3}[0-9]{3,4}[0-9]{4}$/;
-    if (!numberRegex.test(e.target.value) && name === 'CashReceiptInfo') {
-      setValidation2(true);
-    } else {
-      setValidation2(false);
-    }
+
+    setValidation({
+      ...validation,
+      AccountOwner: !nameRegex.test(value) && name === "AccountOwner",
+      CashReceiptInfo: !numberRegex.test(value) && name === "CashReceiptInfo"
+    })
   }
 
-  // Radio display state
-  const [radioValue, setRadioValue] = useState('00');
+  const {AccountOwner:validationAccountOwner ,CashReceiptInfo:validationCashReceiptInfo} = validation;
 
-  const [validation, setValidation] = useState(false);
-  const [validation2, setValidation2] = useState(false);
 
   const radioOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = radio.map((item: ICashRecive) => {
@@ -94,6 +102,7 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
     setRadio(newValue);
   }
 
+  // When chekced radio button , get localstorage value.
   useEffect(() => {
     const storedValue = localStorage.getItem('selectdRadio');
     if (storedValue) {
@@ -101,13 +110,18 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
     }
   }, []);
 
-  const virtualOpenLink = (
-    payName: string,
-    bankCd: string,
-    accountOwner: string,
-    cashReceiptUse: string,
-    cashReceiptInfo: string,
-  ) => {
+  // When browers reload , remove raidovalue localstorage.
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      localStorage.removeItem('selectdRadio');
+    }
+  }, [])
+
+
+  const virtualOpenLink = (params:VirtualOpenParamsProps) => {
+
+    const {payName,bankCd,accountOwner,cashReceiptUse,cashReceiptInfo} = params;
+
     let width = 600;
     let height = 700;
     let top = (window.innerHeight - height) / 2 + screenY;
@@ -125,17 +139,18 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
     }
   }
 
-  // When browers reload , remove raidovalue storage.
-  useEffect(() => {
-    window.onbeforeunload = () => {
-      localStorage.removeItem('selectdRadio');
-    }
-  }, [])
 
   // Form event handler.
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    virtualOpenLink('VirtualAccount', selected, AccountOwner, radioValue, CashReceiptInfo);
+    const params = {
+      payName: 'VirtualAccount',
+      bankCd: selected,
+      accountOwner: AccountOwner,
+      cashReceiptUse: radioValue,
+      cashReceiptInfo: CashReceiptInfo,
+    }
+    virtualOpenLink(params);
   }
 
   return (
@@ -164,7 +179,7 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
             minLength={2}
             required
           />
-          {validation && <CJPaymentValidation validation='* 이름을 제대로 입력해주세요.' />}
+          {validationAccountOwner && <CJPaymentValidation validation='* 이름을 제대로 입력해주세요.' />}
         </div>
 
         {/* Customer PhoneNubmer Text Inputs */}
@@ -181,7 +196,7 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
             minLength={11}
             required
           />
-          {validation2 && <CJPaymentValidation validation='* "-"를 제외하고 번호만 입력해주세요.'/>}
+          {validationCashReceiptInfo && <CJPaymentValidation validation='* "-"를 제외하고 번호만 입력해주세요.' />}
         </div>
       </div>
 
