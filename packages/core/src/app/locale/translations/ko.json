@@ -54,7 +54,7 @@
             "billed_amount_text": "*이 주문에 대해 {total} ({code})가 청구될 예정입니다.",
             "based_on_currency_text": "{total} {code}(을)를 따름",
             "cart_heading": "주문 현황",
-            "cash_on_delivery":"수령 시 지불",
+            "cash_on_delivery": "수령 시 지불",
             "digital_item_text": "디지털 상품",
             "discount_text": "할인",
             "downloads_action": "다운로드로 이동",
@@ -317,6 +317,22 @@
             "zip_continue_action": "Zip으로 계속 진행",
             "zip_name_text": "Zip",
             "zip_display_name_text": "먼저 수령하고, 나중에 지불하기",
+            "cj_payment": {
+                "korea_payment_Creditcard": "신용카드",
+                "korea_payment_PCO": "페이코",
+                "korea_payment_Account": "계좌이체",
+                "korea_payment_VirtualAccount": "가상계좌",
+                "korea_payment_NVP": "네이버페이",
+                "korea_payment_KKO": "카카오페이",
+                "korea_payment_HPP": "휴대폰결제",
+                "virtual_account_bank":"은행 선택",
+                "virtual_account_owner":"가상계좌 입금자성명",
+                "virtual_cashReceipt_info":"현금영수증 발급 번호",
+                "virtual_cashReceipt_useInfo":"현금영수증 발행 구분",
+                "virtual_pay_button_text":"가상계좌로 결제하기",
+                "virtual_name_validation_msg":"* 이름을 제대로 입력해주세요.",
+                "virtual_number_validation_msg":"* '-'를 제외하고 번호만 입력해주세요."
+            },
             "errors": {
                 "additional_action_required": "다음 작업을 계속 진행해주세요.",
                 "authorization_expired": "이 거래에 대한 승인이 만료되었습니다.",
@@ -386,14 +402,7 @@
                 "user_authorization_error": "결제를 처리하는 과정에서 오류가 발생했습니다. 고객센터로 문의해주세요.",
                 "vaulting_service_unavailable": "보관 서비스를 현재 이용할 수 없습니다.",
                 "voided_transaction": "거래가 무효화되어 결제를 처리하지 못했습니다. 다시 시도하시거나, 고객 센터로 문의해주세요."
-            },
-            "korea_payment_Creditcard":"신용카드",
-            "korea_payment_PCO":"페이코",
-            "korea_payment_Account":"계좌이체",
-            "korea_payment_VirtualAccount":"가상계좌",
-            "korea_payment_NVP":"네이버페이",
-            "korea_payment_KKO":"카카오페이",
-            "korea_payment_HPP":"휴대폰결제"
+            }
         },
         "redeemable": {
             "applied_text": "적용됨",
@@ -504,5 +513,4 @@
             "order_status_update_facebook_messenger_heading": "주문 관련 정보 메신저로 즉시 받기"
         }
     }
-  }
-  
+}

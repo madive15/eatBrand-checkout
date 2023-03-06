@@ -21,7 +21,7 @@ const KoreaPayment = ({
       onClick={() => { krPaymentMethods(params) }}
     >
       <TranslatedString
-        id={`payment.korea_payment_${params}`}
+        id={`payment.cj_payment.korea_payment_${params}`}
       />
     </Button>
   );

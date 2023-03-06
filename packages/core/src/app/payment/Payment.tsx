@@ -224,31 +224,26 @@ class Payment extends Component<
             },
             {
                 id: 1,
-                params: "PCO",
-                imgName: "pco"
-            },
-            {
-                id: 2,
                 params: "Account",
                 imgName: "account"
             },
             {
-                id: 3,
+                id: 2,
                 params: "HPP",
                 imgName: "hpp"
             },
             {
-                id: 4,
+                id: 3,
                 params: "NVP",
                 imgName: "nvp"
             },
             {
-                id: 5,
+                id: 4,
                 params: "KKO",
                 imgName: "kakao"
             },
             {
-                id: 6,
+                id: 5,
                 params: "VirtualAccount",
                 imgName: "virtualAccount"
             }

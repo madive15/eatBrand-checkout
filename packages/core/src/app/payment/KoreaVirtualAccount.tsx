@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import CJPaymentValidation from './CJpaymentValidation';
 import { ICashRecive, IVirtualAccout } from './Payment';
 import './cj-payment.scss';
+import { TranslatedString } from '../locale';
 
 interface VirtualProps {
-  virtualAccoutValues: any;
-  methodsCashRecive: any;
+  virtualAccoutValues: IVirtualAccout[];
+  methodsCashRecive: ICashRecive[];
   customizeCheckout: string;
   customerId: string;
   storeHash: string;
@@ -20,7 +21,13 @@ interface VirtualOpenParamsProps {
   cashReceiptInfo: string,
 }
 
-const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerId, storeHash }: VirtualProps) => {
+const KoreaVirtualAccount = ({
+  virtualAccoutValues,
+  customizeCheckout,
+  customerId,
+  storeHash,
+  methodsCashRecive
+}: VirtualProps) => {
 
   // This variables are for prevent to confuse with function(virtualOpenLink) parameter.
   const customizeCheckoutProps = customizeCheckout;
@@ -28,45 +35,28 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
   const storeHashProps = storeHash;
 
   // Select options state
-  const [selected, setSelected] = useState('003');
+  const [selected, setSelected] = useState(virtualAccoutValues[0].value);
 
   // Radio input state
-  const [radio, setRadio] = useState<ICashRecive[]>([{
-    id: 0,
-    method: "미발행",
-    value: "00",
-    tagId: "CashReceiptUse1",
-    checked: true
-  },
-  {
-    id: 1,
-    method: "소득공제",
-    value: "01",
-    tagId: "CashReceiptUse2",
-    checked: false
-  },
-  {
-    id: 2,
-    method: "지출증빙",
-    value: "02",
-    tagId: "CashReceiptUse3",
-    checked: false
-  }]);
+  const [radio, setRadio] = useState<ICashRecive[]>(methodsCashRecive);
 
   // Input customer name , phonenumber states;
   const [textInput, setTextInput] = useState({
     CashReceiptInfo: '',
-    AccountOwner: ''
+    AccountOwner: '',
+    UserPhone: ''
   });
 
-  const { CashReceiptInfo, AccountOwner } = textInput;
+  const { CashReceiptInfo, AccountOwner, UserPhone } = textInput;
+
 
   // Radio display state
-  const [radioValue, setRadioValue] = useState('00');
+  const [radioValue, setRadioValue] = useState(methodsCashRecive[0].value);
 
   const [validation, setValidation] = useState({
-    AccountOwner:false,
-    CashReceiptInfo:false,
+    AccountOwner: false,
+    CashReceiptInfo: false,
+    UserPhone: false,
   });
 
   const onChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,19 +71,21 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
     setValidation({
       ...validation,
       AccountOwner: !nameRegex.test(value) && name === "AccountOwner",
-      CashReceiptInfo: !numberRegex.test(value) && name === "CashReceiptInfo"
+      CashReceiptInfo: !numberRegex.test(value) && name === "CashReceiptInfo",
+      UserPhone: !numberRegex.test(value) && name === "UserPhone",
     })
   }
 
-  const {AccountOwner:validationAccountOwner ,CashReceiptInfo:validationCashReceiptInfo} = validation;
+  const { AccountOwner: validationAccountOwner, CashReceiptInfo: validationCashReceiptInfo, UserPhone: validationPhoneInfo } = validation;
 
 
   const radioOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = radio.map((item: ICashRecive) => {
-      if (item.value === e.target.value) {
+      const {target:{value}} = e;
+      if (item.value === value) {
         item.checked = true;
         setRadioValue(e.target.value);
-        localStorage.setItem('selectdRadio', e.target.value);
+        localStorage.setItem('selectdRadio', value);
       } else {
         item.checked = false;
       }
@@ -118,9 +110,9 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
   }, [])
 
 
-  const virtualOpenLink = (params:VirtualOpenParamsProps) => {
+  const virtualOpenLink = (params: VirtualOpenParamsProps) => {
 
-    const {payName,bankCd,accountOwner,cashReceiptUse,cashReceiptInfo} = params;
+    const { payName, bankCd, accountOwner, cashReceiptUse, cashReceiptInfo } = params;
 
     let width = 600;
     let height = 700;
@@ -133,9 +125,9 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
     const confirmAlert = window.confirm('확인 -> localhost:\n취소 -> payment.madive.co.kr');
 
     if (confirmAlert) {
-      window.open(`http://localhost/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}`, 'popup', spec);
+      window.open(`http://localhost/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
     } else {
-      window.open(`https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}`, 'popup', spec);
+      window.open(`https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
     }
   }
 
@@ -155,8 +147,9 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
 
   return (
     <form onSubmit={handleSubmit} className='virtual-method-form checkout-form'>
-      <label className="col-sm-2 control-label" htmlFor=''>카드코드(CardCode)</label>
-
+      <label className="col-sm-2 control-label" htmlFor='BankCd'>
+        <TranslatedString id="payment.cj_payment.virtual_account_bank" />
+      </label>
       {/* Select options */}
       <select id="selBankCode" className="form-control" name="BankCd" value={selected} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setSelected(e.target.value) }}>
         {virtualAccoutValues.map((item: IVirtualAccout) => {
@@ -167,7 +160,9 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
       {/* Name text input */}
       <div className="form-text-wrap">
         <div className="form-group">
-          <label className="col-sm-2 control-label" htmlFor="AccountOwner">가상계좌 입금자성명 :</label>
+          <label className="col-sm-2 control-label" htmlFor="AccountOwner">
+            <TranslatedString id="payment.cj_payment.virtual_account_owner" />
+          </label>
           <input
             id="AccountOwner"
             className="form-control"
@@ -179,12 +174,14 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
             minLength={2}
             required
           />
-          {validationAccountOwner && <CJPaymentValidation validation='* 이름을 제대로 입력해주세요.' />}
+          {validationAccountOwner && <CJPaymentValidation validation={<TranslatedString id="payment.cj_payment.virtual_name_validation_msg" />} />}
         </div>
 
         {/* Customer PhoneNubmer Text Inputs */}
         <div className="form-group">
-          <label className="col-sm-2 control-label" htmlFor="CashReceiptInfo">현금영수증 발급 번호 :</label>
+          <label className="col-sm-2 control-label" htmlFor="CashReceiptInfo">
+            <TranslatedString id="payment.cj_payment.virtual_cashReceipt_info" />
+          </label>
           <input
             id="CashReceiptInfo"
             className="form-control"
@@ -196,14 +193,35 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
             minLength={11}
             required
           />
-          {validationCashReceiptInfo && <CJPaymentValidation validation='* "-"를 제외하고 번호만 입력해주세요.' />}
+          {validationCashReceiptInfo && <CJPaymentValidation validation="* '-'를 제외하고 입력해주세요." />}
+        </div>
+
+        {/* Customer PhoneNumber that recieve information of using virtual account */}
+        <div className="form-group">
+          <label className="col-sm-2 control-label" htmlFor="UserPhone">
+            현금영수증 안내 받을 전화번호
+          </label>
+          <input
+            id="UserPhone"
+            className="form-control"
+            type="text"
+            name="UserPhone"
+            placeholder='ex:01012341234'
+            value={UserPhone}
+            onChange={onChange2}
+            minLength={11}
+            required
+          />
+          {validationPhoneInfo && <CJPaymentValidation validation="* '-'를 제외하고 입력해주세요." />}
         </div>
       </div>
 
       <div id="cashreceiptDiv">
         <div className="form-group">
           {/* Radio Inputs */}
-          <label className="col-sm-2 control-label" htmlFor="CashReceiptUse">현금영수증 발행 구분</label>
+          <label className="col-sm-2 control-label" htmlFor="CashReceiptUse">
+            <TranslatedString id="payment.cj_payment.virtual_cashReceipt_useInfo" />
+          </label>
           <div className="col-sm-10">
             {radio.map((item: ICashRecive) => {
               return (
@@ -224,7 +242,9 @@ const KoreaVirtualAccount = ({ virtualAccoutValues, customizeCheckout, customerI
           </div>
         </div>
       </div>
-      <button className='go-to-submit'>가상계좌로 결제하기</button>
+      <button className='go-to-submit'>
+        <TranslatedString id="payment.cj_payment.virtual_pay_button_text" />
+      </button>
     </form>
   );
 };

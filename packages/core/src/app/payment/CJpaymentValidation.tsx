@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 interface ValidationProps {
-  validation:string;
+  validation:string | ReactElement
 }
 
 const CJPaymentValidation = ({validation}:ValidationProps) => {
