@@ -319,6 +319,7 @@
             "zip_display_name_text": "먼저 수령하고, 나중에 지불하기",
             "cj_payment": {
                 "korea_payment_Creditcard": "신용카드",
+                "korea_payment_creditcardTest":"신용카드 로컬",
                 "korea_payment_PCO": "페이코",
                 "korea_payment_Account": "계좌이체",
                 "korea_payment_VirtualAccount": "가상계좌",

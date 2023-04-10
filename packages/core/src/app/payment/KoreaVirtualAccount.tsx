@@ -121,14 +121,18 @@ const KoreaVirtualAccount = ({
     let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
     spec += ', width=' + width + ', height=' + height;
     spec += ', top=' + top + ', left=' + left;
+    let openCJpopup;
 
-    const confirmAlert = window.confirm('확인 -> localhost:\n취소 -> payment.madive.co.kr');
+    // const confirmAlert = window.confirm('확인 -> localhost:\n취소 -> payment.madive.co.kr');
+    const VIRTUAL_ACCOUNT_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`;
 
-    if (confirmAlert) {
-      window.open(`http://localhost/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
-    } else {
-      window.open(`https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
-    }
+    // if (confirmAlert) {
+    //   window.open(`http://localhost/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
+    // } else {
+    //   window.open(`https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
+    // }
+    openCJpopup = window.open("","CJVirtualAccountPopUP",spec);
+    openCJpopup && (openCJpopup.location.href = VIRTUAL_ACCOUNT_URL)
   }
 
 

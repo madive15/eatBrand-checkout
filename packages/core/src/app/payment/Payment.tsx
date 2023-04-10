@@ -96,7 +96,8 @@ interface PaymentState {
 interface KoreaPaymentMethodsProps {
     params: string;
     imgName: string;
-    id: number;
+    id: number | string;
+    url?: string;
 }
 
 export interface IVirtualAccout {
@@ -218,34 +219,45 @@ class Payment extends Component<
         // CJ payment mapping(ID, parameter, imgsrcName)
         const krPaymentMethodsString: KoreaPaymentMethodsProps[] = [
             {
-                id: 0,
+                id: 'creditCard',
                 params: "Creditcard",
-                imgName: "credit"
+                imgName: "credit",
+                url: "https://payment.madive.co.kr"
             },
             {
-                id: 1,
+                id: 'creditcardTest',
+                params: "creditcardTest",
+                imgName: "credit",
+                url: "http://localhost"
+            },
+            {
+                id: 'account',
                 params: "Account",
-                imgName: "account"
+                imgName: "account",
+                url: "https://payment.madive.co.kr"
             },
+            // {
+            //     id: 2,
+            //     params: "HPP",
+            //     imgName: "hpp"
+            // },
             {
-                id: 2,
-                params: "HPP",
-                imgName: "hpp"
-            },
-            {
-                id: 3,
+                id: 'naverPay',
                 params: "NVP",
-                imgName: "nvp"
+                imgName: "nvp",
+                url: "https://payment.madive.co.kr"
             },
             {
-                id: 4,
+                id: 'kakaoPay',
                 params: "KKO",
-                imgName: "kakao"
+                imgName: "kakao",
+                url: "https://payment.madive.co.kr"
             },
             {
-                id: 5,
+                id: 'VirtualAccount',
                 params: "VirtualAccount",
-                imgName: "virtualAccount"
+                imgName: "virtualAccount",
+                url: "https://payment.madive.co.kr"
             }
         ]
 
@@ -332,23 +344,60 @@ class Payment extends Component<
         ]
 
         // CJ payment window popup open center
-        const krPaymentMethods = (payName: string) => {
-            const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
-            let PAY_URL;
-            let width = 600;
-            let height = 700;
-            let top = (window.innerHeight - height) / 2 + screenY;
-            let left = (window.innerWidth - width) / 2 + screenX;
-            let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
-            spec += ', width=' + width + ', height=' + height;
-            spec += ', top=' + top + ', left=' + left;
+        // const krPaymentMethods = (payName: string) => {
+        //     const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
+        //     let PAY_URL;
+        //     let width = 600;
+        //     let height = 700;
+        //     let top = (window.innerHeight - height) / 2 + screenY;
+        //     let left = (window.innerWidth - width) / 2 + screenX;
+        //     let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
+        //     spec += ', width=' + width + ', height=' + height;
+        //     spec += ', top=' + top + ', left=' + left;
 
-            // payName이 가상계좌가 아닐때 logic , confirm창 
-            if (!VIRTUAL_ACCOUNT_PARAMS && window.confirm('확인 -> localhost:3000\n취소 -> payment.madive.co.kr')) {
-                PAY_URL = `http://localhost/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
-            } else {
-                PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
-            }
+        //     // payName이 가상계좌가 아닐때 logic , confirm창 
+        //     if (!VIRTUAL_ACCOUNT_PARAMS && window.confirm('확인 -> localhost:3000\n취소 -> payment.madive.co.kr')) {
+        //         PAY_URL = `http://localhost/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+        //     } else {
+        //         PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+        //     }
+        //     // payName이 가상계좌 일때 logic
+        //     if (VIRTUAL_ACCOUNT_PARAMS) {
+        //         this.setState({
+        //             showVirtualMethod: true
+        //         });
+        //         setTimeout(() => {
+        //             window.scrollTo(0, document.body.scrollHeight);
+        //         }, 300);
+        //         // payName 파라미터가 아닐떄 virtual state logic
+        //     } else if (!VIRTUAL_ACCOUNT_PARAMS) {
+        //         this.setState({
+        //             showVirtualMethod: false
+        //         })
+        //         window.open(PAY_URL, 'eatBrandPayPopup', spec);
+        //     }
+        // }
+
+        const openCJpayment = (payName: string, domain?: string) => {
+            const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
+            const GUEST_CUSTOMER_ID = customzieCart.customerId === 0;
+            const CJPAYMENT_URL = `${domain}/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+            const features = {
+                status: "no",
+                menubar: "no",
+                toolbar: "no",
+                resizable: "no",
+                width: 600,
+                height: 700,
+                top: (window.innerHeight - 700) / 2 + screenY,
+                left: (window.innerWidth - 600) / 2 + screenX,
+            };
+
+            const spec = Object.entries(features)
+                .map(([key, value]) => `${key}=${value}`)
+                .join(",");
+            let openCJpopup;
+
             // payName이 가상계좌 일때 logic
             if (VIRTUAL_ACCOUNT_PARAMS) {
                 this.setState({
@@ -360,11 +409,15 @@ class Payment extends Component<
                 // payName 파라미터가 아닐떄 virtual state logic
             } else if (!VIRTUAL_ACCOUNT_PARAMS) {
                 this.setState({
-                    showVirtualMethod: false
-                })
-                window.open(PAY_URL, 'popup', spec);
+                    showVirtualMethod: false,
+                });
+                openCJpopup = window.open("", "eatBrandCJPopUp", spec);
+                openCJpopup && (openCJpopup.location.href = CJPAYMENT_URL);
+            } else if (GUEST_CUSTOMER_ID) {
+                console.log("LOGIN FIRST!");
             }
         }
+        
 
 
         return (
@@ -406,10 +459,11 @@ class Payment extends Component<
                         {krPaymentMethodsString.map((item: KoreaPaymentMethodsProps) => {
                             return (
                                 <KoreaPayment
-                                    krPaymentMethods={krPaymentMethods}
+                                    krPaymentMethods={openCJpayment}
                                     params={item.params}
                                     imgName={item.imgName}
                                     key={item.id}
+                                    url={item.url}
                                 />
                             )
                         })}
@@ -418,7 +472,7 @@ class Payment extends Component<
                         <KoreaVirtualAccount
                             virtualAccoutValues={virtualAccoutValues}
                             methodsCashRecive={methodsCashRecive}
-                            krPaymentMethods={krPaymentMethods}
+                            krPaymentMethods={openCJpayment}
                             customizeCheckout={customizeCheckout}
                             customerId={customzieCart.customerId}
                             storeHash={storeHash}
