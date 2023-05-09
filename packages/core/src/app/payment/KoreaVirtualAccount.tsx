@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import CJPaymentValidation from './CJpaymentValidation';
 import { ICashRecive, IVirtualAccout } from './Payment';
 import './cj-payment.scss';
 import { TranslatedString } from '../locale';
+import VirtualAccountInput from './VirtualAccountInput';
 
 interface VirtualProps {
   virtualAccoutValues: IVirtualAccout[];
@@ -19,6 +19,16 @@ interface VirtualOpenParamsProps {
   accountOwner: string,
   cashReceiptUse: string,
   cashReceiptInfo: string,
+}
+
+interface VirtualInputTypes {
+  title: string;
+  inputID: string;
+  inputValue: string;
+  inputName: string;
+  placeholder: string;
+  validationType: boolean;
+  validationString: string;
 }
 
 const KoreaVirtualAccount = ({
@@ -47,17 +57,19 @@ const KoreaVirtualAccount = ({
     UserPhone: ''
   });
 
-  const { CashReceiptInfo, AccountOwner, UserPhone } = textInput;
-
-
-  // Radio display state
-  const [radioValue, setRadioValue] = useState(methodsCashRecive[0].value);
-
   const [validation, setValidation] = useState({
     AccountOwner: false,
     CashReceiptInfo: false,
     UserPhone: false,
   });
+
+
+  const { CashReceiptInfo, AccountOwner, UserPhone } = textInput;
+  const { AccountOwner: AccountOwnerValidation, CashReceiptInfo: CashReceiptInfoValidation, UserPhone: UserPhoneValidation } = validation;
+
+  // Radio display state
+  const [radioValue, setRadioValue] = useState(methodsCashRecive[0].value);
+
 
   const onChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { target: { name, value } } = e;
@@ -76,7 +88,7 @@ const KoreaVirtualAccount = ({
     })
   }
 
-  const { AccountOwner: validationAccountOwner, CashReceiptInfo: validationCashReceiptInfo, UserPhone: validationPhoneInfo } = validation;
+  // const { AccountOwner: validationAccountOwner, CashReceiptInfo: validationCashReceiptInfo, UserPhone: validationPhoneInfo } = validation;
 
 
   const radioOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +96,7 @@ const KoreaVirtualAccount = ({
       const {target:{value}} = e;
       if (item.value === value) {
         item.checked = true;
-        setRadioValue(e.target.value);
+        setRadioValue(value);
         localStorage.setItem('selectdRadio', value);
       } else {
         item.checked = false;
@@ -122,15 +134,8 @@ const KoreaVirtualAccount = ({
     spec += ', width=' + width + ', height=' + height;
     spec += ', top=' + top + ', left=' + left;
     let openCJpopup;
-
-    // const confirmAlert = window.confirm('확인 -> localhost:\n취소 -> payment.madive.co.kr');
     const VIRTUAL_ACCOUNT_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`;
 
-    // if (confirmAlert) {
-    //   window.open(`http://localhost/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
-    // } else {
-    //   window.open(`https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`, 'popup', spec);
-    // }
     openCJpopup = window.open("","CJVirtualAccountPopUP",spec);
     openCJpopup && (openCJpopup.location.href = VIRTUAL_ACCOUNT_URL)
   }
@@ -149,6 +154,12 @@ const KoreaVirtualAccount = ({
     virtualOpenLink(params);
   }
 
+  const virtualInputInfo: VirtualInputTypes[] = [
+    { title: '가상계좌 입금자성명 :', inputID: 'AccountOwner', inputValue: AccountOwner, inputName: 'AccountOwner', placeholder: 'ex:홍길동', validationType: AccountOwnerValidation, validationString: '* 이름을 제대로 입력해주세요.' },
+    { title: '현금영수증 발급 번호 :', inputID: 'CashReceiptInfo', inputValue: CashReceiptInfo, inputName: 'CashReceiptInfo', placeholder: '"-" 를 제외 하고 입력해주세요!!.', validationType: CashReceiptInfoValidation, validationString: '* "-"를 제외하고 번호만 입력해주세요.' },
+    { title: '현금연영수증 발급 받을 번호:', inputID: 'UserPhone', inputValue: UserPhone, inputName: 'UserPhone', placeholder: '"-" 를 제외 하고 입력해주세요.', validationType: UserPhoneValidation, validationString: '* "-"를 제외하고 번호만 입력해주세요.' }
+  ]
+
   return (
     <form onSubmit={handleSubmit} className='virtual-method-form checkout-form'>
       <label className="col-sm-2 control-label" htmlFor='BankCd'>
@@ -163,61 +174,19 @@ const KoreaVirtualAccount = ({
 
       {/* Name text input */}
       <div className="form-text-wrap">
-        <div className="form-group">
-          <label className="col-sm-2 control-label" htmlFor="AccountOwner">
-            <TranslatedString id="payment.cj_payment.virtual_account_owner" />
-          </label>
-          <input
-            id="AccountOwner"
-            className="form-control"
-            type="text"
-            name="AccountOwner"
-            placeholder='ex:홍길동'
-            value={AccountOwner}
-            onChange={onChange2}
-            minLength={2}
-            required
+        {virtualInputInfo.map(({ title, inputID, inputValue, inputName, placeholder, validationType, validationString }: VirtualInputTypes) => (
+          <VirtualAccountInput
+            title={title}
+            inputID={inputID}
+            inputValue={inputValue}
+            inputName={inputName}
+            onChangeP={onChange2}
+            placeholder={placeholder}
+            validationType={validationType}
+            validationString={validationString}
+            key={title}
           />
-          {validationAccountOwner && <CJPaymentValidation validation={<TranslatedString id="payment.cj_payment.virtual_name_validation_msg" />} />}
-        </div>
-
-        {/* Customer PhoneNubmer Text Inputs */}
-        <div className="form-group">
-          <label className="col-sm-2 control-label" htmlFor="CashReceiptInfo">
-            <TranslatedString id="payment.cj_payment.virtual_cashReceipt_info" />
-          </label>
-          <input
-            id="CashReceiptInfo"
-            className="form-control"
-            type="text"
-            name="CashReceiptInfo"
-            placeholder='ex:01012341234'
-            value={CashReceiptInfo}
-            onChange={onChange2}
-            minLength={11}
-            required
-          />
-          {validationCashReceiptInfo && <CJPaymentValidation validation="* '-'를 제외하고 입력해주세요." />}
-        </div>
-
-        {/* Customer PhoneNumber that recieve information of using virtual account */}
-        <div className="form-group">
-          <label className="col-sm-2 control-label" htmlFor="UserPhone">
-            현금영수증 안내 받을 전화번호
-          </label>
-          <input
-            id="UserPhone"
-            className="form-control"
-            type="text"
-            name="UserPhone"
-            placeholder='ex:01012341234'
-            value={UserPhone}
-            onChange={onChange2}
-            minLength={11}
-            required
-          />
-          {validationPhoneInfo && <CJPaymentValidation validation="* '-'를 제외하고 입력해주세요." />}
-        </div>
+        ))}
       </div>
 
       <div id="cashreceiptDiv">

@@ -222,43 +222,32 @@ class Payment extends Component<
                 id: 'creditCard',
                 params: "Creditcard",
                 imgName: "credit",
-                url: "https://payment.madive.co.kr"
-            },
-            {
-                id: 'creditcardTest',
-                params: "creditcardTest",
-                imgName: "credit",
-                url: "http://localhost"
-            },
-            {
-                id: 'account',
-                params: "Account",
-                imgName: "account",
-                url: "https://payment.madive.co.kr"
             },
             // {
-            //     id: 2,
+            //     id: 'account',
+            //     params: "Account",
+            //     imgName: "account",
+            // },
+            // {
+            //     id: phonePay,
             //     params: "HPP",
             //     imgName: "hpp"
             // },
             {
                 id: 'naverPay',
-                params: "NVP",
+                params: "NVA",
                 imgName: "nvp",
-                url: "https://payment.madive.co.kr"
             },
             {
                 id: 'kakaoPay',
                 params: "KKO",
                 imgName: "kakao",
-                url: "https://payment.madive.co.kr"
             },
-            {
-                id: 'VirtualAccount',
-                params: "VirtualAccount",
-                imgName: "virtualAccount",
-                url: "https://payment.madive.co.kr"
-            }
+            // {
+            //     id: 'VirtualAccount',
+            //     params: "VirtualAccount",
+            //     imgName: "virtualAccount",
+            // }
         ]
 
         const virtualAccoutValues: IVirtualAccout[] = [
@@ -378,10 +367,11 @@ class Payment extends Component<
         //     }
         // }
 
-        const openCJpayment = (payName: string, domain?: string) => {
+        const openCJpayment = (payName: string) => {
             const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
             const GUEST_CUSTOMER_ID = customzieCart.customerId === 0;
-            const CJPAYMENT_URL = `${domain}/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+            const CJPAYMENT_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+            let openCJpopup;
             const features = {
                 status: "no",
                 menubar: "no",
@@ -392,11 +382,8 @@ class Payment extends Component<
                 top: (window.innerHeight - 700) / 2 + screenY,
                 left: (window.innerWidth - 600) / 2 + screenX,
             };
-
             const spec = Object.entries(features)
-                .map(([key, value]) => `${key}=${value}`)
-                .join(",");
-            let openCJpopup;
+                .map(([key, value]) => `${key}=${value}`).join(",");
 
             // payName이 가상계좌 일때 logic
             if (VIRTUAL_ACCOUNT_PARAMS) {
@@ -417,8 +404,6 @@ class Payment extends Component<
                 console.log("LOGIN FIRST!");
             }
         }
-        
-
 
         return (
             <PaymentContext.Provider value={this.getContextValue()}>
@@ -463,7 +448,6 @@ class Payment extends Component<
                                     params={item.params}
                                     imgName={item.imgName}
                                     key={item.id}
-                                    url={item.url}
                                 />
                             )
                         })}
@@ -561,8 +545,6 @@ class Payment extends Component<
         if (shouldHidePaymentSubmitButton[uniqueId] === disabled) {
             return;
         }
-
-        console.log(this.state);
 
         this.setState({
             shouldHidePaymentSubmitButton: {
