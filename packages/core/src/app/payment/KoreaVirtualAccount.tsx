@@ -5,7 +5,6 @@ import { TranslatedString } from '../locale';
 import VirtualAccountInput from './VirtualAccountInput';
 
 interface VirtualProps {
-  virtualAccoutValues: IVirtualAccout[];
   methodsCashRecive: ICashRecive[];
   customizeCheckout: string;
   customerId: string;
@@ -31,8 +30,66 @@ interface VirtualInputTypes {
   validationString: string;
 }
 
+const VirtualBank: IVirtualAccout[] = [
+  {
+    id: 0,
+    value: "003",
+    bank: "기업"
+  },
+  {
+    id: 1,
+    value: "004",
+    bank: "국민"
+  },
+  {
+    id: 2,
+    value: "007",
+    bank: "수협"
+  },
+  {
+    id: 3,
+    value: "011",
+    bank: "농협"
+  },
+  {
+    id: 4,
+    value: "020",
+    bank: "우리"
+  },
+  {
+    id: 5,
+    value: "031",
+    bank: "대구"
+  },
+  {
+    id: 6,
+    value: "032",
+    bank: "부산"
+  },
+  {
+    id: 7,
+    value: "039",
+    bank: "경남"
+  },
+  {
+    id: 8,
+    value: "071",
+    bank: "우체국"
+  },
+  {
+    id: 9,
+    value: "081",
+    bank: "하나"
+  },
+  {
+    id: 10,
+    value: "088",
+    bank: "신한"
+  },
+]
+
+
 const KoreaVirtualAccount = ({
-  virtualAccoutValues,
   customizeCheckout,
   customerId,
   storeHash,
@@ -45,10 +102,12 @@ const KoreaVirtualAccount = ({
   const storeHashProps = storeHash;
 
   // Select options state
-  const [selected, setSelected] = useState(virtualAccoutValues[0].value);
+  const [selected, setSelected] = useState<string>(VirtualBank[0].value);
 
   // Radio input state
   const [radio, setRadio] = useState<ICashRecive[]>(methodsCashRecive);
+
+  const [isDimmed, setIsDimmed] = useState(false);
 
   // Input customer name , phonenumber states;
   const [textInput, setTextInput] = useState({
@@ -93,7 +152,7 @@ const KoreaVirtualAccount = ({
 
   const radioOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = radio.map((item: ICashRecive) => {
-      const {target:{value}} = e;
+      const { target: { value } } = e;
       if (item.value === value) {
         item.checked = true;
         setRadioValue(value);
@@ -133,11 +192,22 @@ const KoreaVirtualAccount = ({
     let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
     spec += ', width=' + width + ', height=' + height;
     spec += ', top=' + top + ', left=' + left;
-    let openCJpopup;
+    let openCJpopup: any;
     const VIRTUAL_ACCOUNT_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckoutProps}&cid=${customerIdProps}&payCd=${payName}&storeHash=${storeHashProps}&bankCd=${bankCd}&accountOwner=${accountOwner}&cashReceiptUse=${cashReceiptUse}&cashReceiptInfo=${cashReceiptInfo}&UserPhone=${UserPhone}`;
+  
+    openCJpopup = window.open("", "CJVirtualAccountPopUP", spec);
+    openCJpopup && (openCJpopup.location.href = VIRTUAL_ACCOUNT_URL);
 
-    openCJpopup = window.open("","CJVirtualAccountPopUP",spec);
-    openCJpopup && (openCJpopup.location.href = VIRTUAL_ACCOUNT_URL)
+    setIsDimmed(true);
+
+    const checkPopupClosed = () => {
+      if (openCJpopup && openCJpopup.closed) {
+        setIsDimmed(false);
+      } else {
+        setTimeout(checkPopupClosed, 100); // 일정 간격으로 팝업 창이 닫히는지 확인
+      }
+    };
+    checkPopupClosed();
   }
 
 
@@ -161,64 +231,67 @@ const KoreaVirtualAccount = ({
   ]
 
   return (
-    <form onSubmit={handleSubmit} className='virtual-method-form checkout-form'>
-      <label className="col-sm-2 control-label" htmlFor='BankCd'>
-        <TranslatedString id="payment.cj_payment.virtual_account_bank" />
-      </label>
-      {/* Select options */}
-      <select id="selBankCode" className="form-control" name="BankCd" value={selected} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setSelected(e.target.value) }}>
-        {virtualAccoutValues.map((item: IVirtualAccout) => {
-          return <option key={item.id} value={item.value}>{item.bank}</option>
-        })}
-      </select>
+    <>
+      {isDimmed && <div className='cjpayment-dimmed'></div>}
+      <form onSubmit={handleSubmit} className='virtual-method-form checkout-form'>
+        <label className="col-sm-2 control-label" htmlFor='BankCd'>
+          <TranslatedString id="payment.cj_payment.virtual_account_bank" />
+        </label>
+        {/* Select options */}
+        <select id="selBankCode" className="form-control" name="BankCd" value={selected} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setSelected(e.target.value as any) }}>
+          {VirtualBank.map((item: IVirtualAccout) => {
+            return <option key={item.id} value={item.value}>{item.bank}</option>
+          })}
+        </select>
 
-      {/* Name text input */}
-      <div className="form-text-wrap">
-        {virtualInputInfo.map(({ title, inputID, inputValue, inputName, placeholder, validationType, validationString }: VirtualInputTypes) => (
-          <VirtualAccountInput
-            title={title}
-            inputID={inputID}
-            inputValue={inputValue}
-            inputName={inputName}
-            onChangeP={onChange2}
-            placeholder={placeholder}
-            validationType={validationType}
-            validationString={validationString}
-            key={title}
-          />
-        ))}
-      </div>
+        {/* Name text input */}
+        <div className="form-text-wrap">
+          {virtualInputInfo.map(({ title, inputID, inputValue, inputName, placeholder, validationType, validationString }: VirtualInputTypes) => (
+            <VirtualAccountInput
+              title={title}
+              inputID={inputID}
+              inputValue={inputValue}
+              inputName={inputName}
+              onChangeP={onChange2}
+              placeholder={placeholder}
+              validationType={validationType}
+              validationString={validationString}
+              key={title}
+            />
+          ))}
+        </div>
 
-      <div id="cashreceiptDiv">
-        <div className="form-group">
-          {/* Radio Inputs */}
-          <label className="col-sm-2 control-label" htmlFor="CashReceiptUse">
-            <TranslatedString id="payment.cj_payment.virtual_cashReceipt_useInfo" />
-          </label>
-          <div className="col-sm-10">
-            {radio.map((item: ICashRecive) => {
-              return (
-                <React.Fragment key={item.id}>
-                  <input
-                    type="radio"
-                    name="CashReceiptUse"
-                    id={item.tagId}
-                    value={item.value}
-                    checked={item.checked}
-                    onChange={radioOnchange}
-                    required
-                  />
-                  <label htmlFor={item.tagId}>{item.method}</label>
-                </React.Fragment>
-              )
-            })}
+        <div id="cashreceiptDiv">
+          <div className="form-group">
+            {/* Radio Inputs */}
+            <label className="col-sm-2 control-label" htmlFor="CashReceiptUse">
+              <TranslatedString id="payment.cj_payment.virtual_cashReceipt_useInfo" />
+            </label>
+            <div className="col-sm-10">
+              {radio.map((item: ICashRecive) => {
+                return (
+                  <React.Fragment key={item.id}>
+                    <input
+                      type="radio"
+                      name="CashReceiptUse"
+                      id={item.tagId}
+                      value={item.value}
+                      checked={item.checked}
+                      onChange={radioOnchange}
+                      required
+                    />
+                    <label htmlFor={item.tagId}>{item.method}</label>
+                  </React.Fragment>
+                )
+              })}
+            </div>
           </div>
         </div>
-      </div>
-      <button className='go-to-submit'>
-        <TranslatedString id="payment.cj_payment.virtual_pay_button_text" />
-      </button>
-    </form>
+        <button className='go-to-submit'>
+          <TranslatedString id="payment.cj_payment.virtual_pay_button_text" />
+        </button>
+      </form>
+    </>
   );
 };
 

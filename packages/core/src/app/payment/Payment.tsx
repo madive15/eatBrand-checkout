@@ -91,6 +91,7 @@ interface PaymentState {
     submitFunctions: { [key: string]: ((values: PaymentFormValues) => void) | null };
     validationSchemas: { [key: string]: ObjectSchema<Partial<PaymentFormValues>> | null };
     showVirtualMethod: boolean;
+    isDimmed: boolean;
 }
 
 interface KoreaPaymentMethodsProps {
@@ -126,7 +127,8 @@ class Payment extends Component<
         shouldHidePaymentSubmitButton: {},
         validationSchemas: {},
         submitFunctions: {},
-        showVirtualMethod:false
+        showVirtualMethod: false,
+        isDimmed: false,
     };
 
     private getContextValue = memoizeOne(() => {
@@ -207,6 +209,7 @@ class Payment extends Component<
             validationSchemas,
             shouldHidePaymentSubmitButton,
             showVirtualMethod,
+            isDimmed,
         } = this.state;
 
 
@@ -223,16 +226,21 @@ class Payment extends Component<
                 params: "Creditcard",
                 imgName: "credit",
             },
-            // {
-            //     id: 'account',
-            //     params: "Account",
-            //     imgName: "account",
-            // },
-            // {
-            //     id: phonePay,
-            //     params: "HPP",
-            //     imgName: "hpp"
-            // },
+            {
+                id: 'account',
+                params: "Account",
+                imgName: "account",
+            },
+            {
+                id: 'payco',
+                params: "PCO",
+                imgName: "pco",
+            },
+            {
+                id: 'phonePay',
+                params: "HPP",
+                imgName: "hpp"
+            },
             {
                 id: 'naverPay',
                 params: "NVA",
@@ -243,69 +251,11 @@ class Payment extends Component<
                 params: "KKO",
                 imgName: "kakao",
             },
-            // {
-            //     id: 'VirtualAccount',
-            //     params: "VirtualAccount",
-            //     imgName: "virtualAccount",
-            // }
-        ]
-
-        const virtualAccoutValues: IVirtualAccout[] = [
             {
-                id: 0,
-                value: "003",
-                bank: "기업"
-            },
-            {
-                id: 1,
-                value: "004",
-                bank: "국민"
-            },
-            {
-                id: 2,
-                value: "007",
-                bank: "수협"
-            },
-            {
-                id: 3,
-                value: "011",
-                bank: "농협"
-            },
-            {
-                id: 4,
-                value: "020",
-                bank: "우리"
-            },
-            {
-                id: 5,
-                value: "031",
-                bank: "대구"
-            },
-            {
-                id: 6,
-                value: "032",
-                bank: "부산"
-            },
-            {
-                id: 7,
-                value: "039",
-                bank: "경남"
-            },
-            {
-                id: 8,
-                value: "071",
-                bank: "우체국"
-            },
-            {
-                id: 9,
-                value: "081",
-                bank: "하나"
-            },
-            {
-                id: 10,
-                value: "088",
-                bank: "신한"
-            },
+                id: 'VirtualAccount',
+                params: "VirtualAccount",
+                imgName: "virtualAccount",
+            }
         ]
 
         const methodsCashRecive: ICashRecive[] = [
@@ -333,23 +283,75 @@ class Payment extends Component<
         ]
 
         // CJ payment window popup open center
-        // const krPaymentMethods = (payName: string) => {
-        //     const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
-        //     let PAY_URL;
-        //     let width = 600;
-        //     let height = 700;
-        //     let top = (window.innerHeight - height) / 2 + screenY;
-        //     let left = (window.innerWidth - width) / 2 + screenX;
-        //     let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
-        //     spec += ', width=' + width + ', height=' + height;
-        //     spec += ', top=' + top + ', left=' + left;
+        const openCJpayment = (payName: string) => {
+            const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
+            let popup: Window | null = null;
+            let width = 600;
+            let height = 700;
+            let top = (window.innerHeight - height) / 2 + screenY;
+            let left = (window.innerWidth - width) / 2 + screenX;
+            let spec = 'status=no, menubar=no, toolbar=no, resizable=no';
+            spec += ', width=' + width + ', height=' + height;
+            spec += ', top=' + top + ', left=' + left;
 
-        //     // payName이 가상계좌가 아닐때 logic , confirm창 
-        //     if (!VIRTUAL_ACCOUNT_PARAMS && window.confirm('확인 -> localhost:3000\n취소 -> payment.madive.co.kr')) {
-        //         PAY_URL = `http://localhost/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
-        //     } else {
-        //         PAY_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
-        //     }
+            
+            const LOCALHOST = 'http://localhost';
+            const PAYMENT_URL = 'https://payment.madive.co.kr';
+
+            let openCJpopup: string;
+
+            if (!VIRTUAL_ACCOUNT_PARAMS && window.confirm('확인 -> localhost:3000\n취소 -> payment.madive.co.kr')) {
+                openCJpopup = `${LOCALHOST}/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+            } else {
+                openCJpopup = `${PAYMENT_URL}/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+            }
+
+            if (VIRTUAL_ACCOUNT_PARAMS) {
+                this.setState({
+                    showVirtualMethod: true,
+                });
+                setTimeout(() => {
+                    window.scrollTo(0, document.body.scrollHeight);
+                }, 300);
+            } else if (!VIRTUAL_ACCOUNT_PARAMS) {
+                this.setState({
+                    showVirtualMethod: false,
+                    isDimmed: true,
+                });
+                popup = window.open(openCJpopup, 'eatBrandPayPopup', spec);
+            }
+
+            const checkPopupClosed = () => {
+                if (popup && popup.closed) {
+                    this.setState({
+                        isDimmed: false,
+                    });
+                } else {
+                    setTimeout(checkPopupClosed, 100); // 일정 간격으로 팝업 창이 닫히는지 확인
+                }
+            };
+
+            checkPopupClosed();
+        };
+
+        // const openCJpayment = (payName: string) => {
+        //     const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
+        //     const GUEST_CUSTOMER_ID = customzieCart.customerId === 0;
+        //     const CJPAYMENT_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
+        //     let openCJpopup: any;
+        //     const features = {
+        //         status: "no",
+        //         menubar: "no",
+        //         toolbar: "no",
+        //         resizable: "no",
+        //         width: 600,
+        //         height: 700,
+        //         top: (window.innerHeight - 700) / 2 + screenY,
+        //         left: (window.innerWidth - 600) / 2 + screenX,
+        //     };
+        //     const spec = Object.entries(features)
+        //         .map(([key, value]) => `${key}=${value}`).join(",");
+
         //     // payName이 가상계좌 일때 logic
         //     if (VIRTUAL_ACCOUNT_PARAMS) {
         //         this.setState({
@@ -361,52 +363,29 @@ class Payment extends Component<
         //         // payName 파라미터가 아닐떄 virtual state logic
         //     } else if (!VIRTUAL_ACCOUNT_PARAMS) {
         //         this.setState({
-        //             showVirtualMethod: false
-        //         })
-        //         window.open(PAY_URL, 'eatBrandPayPopup', spec);
+        //             showVirtualMethod: false,
+        //             isDimmed: true
+        //         });
+        //         openCJpopup = window.open("", "eatBrandCJPopUp", spec);
+        //         openCJpopup && (openCJpopup.location.href = CJPAYMENT_URL);
+        //     } else if (GUEST_CUSTOMER_ID) {
+        //         console.log("LOGIN FIRST!");
         //     }
+        //     const checkPopupClosed = () => {
+        //         if (openCJpopup && openCJpopup.closed) {
+        //             this.setState({
+        //                 isDimmed: false,
+        //             })
+        //         } else {
+        //             setTimeout(checkPopupClosed, 100); // 일정 간격으로 팝업 창이 닫히는지 확인
+        //         }
+        //     };
+        //     checkPopupClosed();
         // }
-
-        const openCJpayment = (payName: string) => {
-            const VIRTUAL_ACCOUNT_PARAMS = payName === 'VirtualAccount';
-            const GUEST_CUSTOMER_ID = customzieCart.customerId === 0;
-            const CJPAYMENT_URL = `https://payment.madive.co.kr/openPayment?id=${customizeCheckout}&cid=${customzieCart.customerId}&payCd=${payName}&storeHash=${storeHash}`;
-            let openCJpopup;
-            const features = {
-                status: "no",
-                menubar: "no",
-                toolbar: "no",
-                resizable: "no",
-                width: 600,
-                height: 700,
-                top: (window.innerHeight - 700) / 2 + screenY,
-                left: (window.innerWidth - 600) / 2 + screenX,
-            };
-            const spec = Object.entries(features)
-                .map(([key, value]) => `${key}=${value}`).join(",");
-
-            // payName이 가상계좌 일때 logic
-            if (VIRTUAL_ACCOUNT_PARAMS) {
-                this.setState({
-                    showVirtualMethod: true
-                });
-                setTimeout(() => {
-                    window.scrollTo(0, document.body.scrollHeight);
-                }, 300);
-                // payName 파라미터가 아닐떄 virtual state logic
-            } else if (!VIRTUAL_ACCOUNT_PARAMS) {
-                this.setState({
-                    showVirtualMethod: false,
-                });
-                openCJpopup = window.open("", "eatBrandCJPopUp", spec);
-                openCJpopup && (openCJpopup.location.href = CJPAYMENT_URL);
-            } else if (GUEST_CUSTOMER_ID) {
-                console.log("LOGIN FIRST!");
-            }
-        }
 
         return (
             <PaymentContext.Provider value={this.getContextValue()}>
+                {isDimmed && <div className='cjpayment-dimmed'></div>}
                 <LoadingOverlay isLoading={!isReady} unmountContentWhenLoading>
                     {!isEmpty(methods) && defaultMethod && (
                         <PaymentForm
@@ -454,7 +433,6 @@ class Payment extends Component<
                     </div>
                     {showVirtualMethod &&
                         <KoreaVirtualAccount
-                            virtualAccoutValues={virtualAccoutValues}
                             methodsCashRecive={methodsCashRecive}
                             krPaymentMethods={openCJpayment}
                             customizeCheckout={customizeCheckout}

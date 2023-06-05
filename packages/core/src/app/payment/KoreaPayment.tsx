@@ -13,6 +13,7 @@ const KoreaPayment = ({
   imgName,
   krPaymentMethods
 }: KoreaPaymentProps) => {
+  
   return (
     <Button
       className={`button--slab korea-btn ${imgName}`}

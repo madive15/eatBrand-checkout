@@ -22,8 +22,9 @@ const VirtualAccountInput = ({
   validationType,
   validationString,
   onChangeP
-}: VirtualAccoutInputProps) => {
-
+}: VirtualAccoutInputProps) => 
+{
+  
   return (
     <div className="form-group">
       <label className="col-sm-2 control-label" htmlFor={inputID}>{title}</label>
